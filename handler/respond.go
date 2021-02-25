@@ -11,3 +11,8 @@ func errorRespond(w http.ResponseWriter, r Response) {
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	json.NewEncoder(w).Encode(r)
 }
+func respond(w http.ResponseWriter, c int) {
+	w.WriteHeader(c)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+}

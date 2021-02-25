@@ -28,7 +28,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	respond(w, http.StatusCreated)
 	return
 }
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +50,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	respond(w, http.StatusOK)
 	return
 }
