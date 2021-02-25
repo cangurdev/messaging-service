@@ -16,7 +16,7 @@ func NewAuthService(authRepository authRepository.AuthRepository) AuthService {
 }
 
 func (*service) Register(username, password string) error {
-	if !isAvailableUsername(username) {
+	if isAvailableUsername(username) {
 		return errors.New("username is not available")
 	}
 	bytePassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -45,7 +45,7 @@ func (*service) Login(username, password string) error {
 func isAvailableUsername(username string) bool {
 	_, err := repository.GetUser(username)
 	if err != nil {
-		return true
+		return false
 	}
-	return false
+	return true
 }
