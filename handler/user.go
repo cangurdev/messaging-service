@@ -24,6 +24,12 @@ type Message struct {
 	Msg      string
 	date     string
 }
+type Block struct {
+	Username    string
+	BlockedUser string
+}
+
+var service = services.NewUserService(repositories.NewUserRepository())
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -36,8 +42,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(resp)
 		return
 	}
-
-	service := services.NewUserService(repositories.NewUserRepository())
 
 	err = service.Register(u.Username, u.Password)
 
@@ -61,8 +65,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service := services.NewUserService(repositories.NewUserRepository())
-
 	err = service.Login(u.Username, u.Password)
 
 	if err != nil {
@@ -81,8 +83,6 @@ func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service := services.NewUserService(repositories.NewUserRepository())
-
 	err = service.SendMessage(m.Username, m.Msg, m.date)
 
 	if err != nil {
@@ -91,4 +91,17 @@ func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 }
 func ViewMessages(w http.ResponseWriter, r *http.Request) {
 
+}
+
+func BlockUserHandler(w http.ResponseWriter, r *http.Request) {
+	var b Block
+	err := json.NewDecoder(r.Body).Decode(&b)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	err = service.BlockUser(b.Username, b.BlockedUser)
+	if err != nil {
+		return
+	}
 }

@@ -66,6 +66,12 @@ func (*repository) SendMessage(username, msg, date string) error {
 func (*repository) GetMessages(username string) error {
 	return nil
 }
-func (*repository) BlockUser(username string) error {
+func (*repository) BlockUser(username, blockedUser string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, err := db.Connection().Collection("users").UpdateOne(ctx, bson.M{"username": username}, bson.D{{"$push", bson.D{{"blockedUsers", blockedUser}}}})
+	if err != nil {
+		return err
+	}
 	return nil
 }

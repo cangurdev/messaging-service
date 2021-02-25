@@ -39,6 +39,10 @@ func (*service) SendMessage(username, msg, date string) error {
 func (*service) ViewMessages(username string) error {
 	return nil
 }
-func (*service) BlockUser(username string) error {
+func (*service) BlockUser(username, blockedUser string) error {
+	err := repository.BlockUser(username, blockedUser)
+	if err != nil {
+		return err
+	}
 	return nil
 }

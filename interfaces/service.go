@@ -5,5 +5,5 @@ type UserService interface {
 	Login(username, password string) error
 	SendMessage(username, msg, date string) error
 	ViewMessages(username string) error
-	BlockUser(username string) error
+	BlockUser(username, blockedUser string) error
 }
