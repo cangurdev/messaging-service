@@ -1,44 +1,22 @@
 package handler
 
 import (
+	"cvngur/messaging-service/models"
 	"cvngur/messaging-service/repositories"
 	"cvngur/messaging-service/services"
 	"encoding/json"
 	"net/http"
 )
 
-type User struct {
-	Username     string   `json:"username"`
-	Password     string   `json:"password"`
-	Messages     []string `json:"messages"`
-	blockedUsers []string `json:"blockedUsers"`
-}
-type Response struct {
-	StatusCode int
-	Msg        string
-	Method     string
-	Name       string
-}
-type Message struct {
-	FromUser string `json:"fromUser"`
-	ToUser   string `json:"toUser"`
-	Msg      string `json:"msg"`
-	date     string `json:"date"`
-}
-type Block struct {
-	Username    string
-	BlockedUser string
-}
-
 var service = services.NewUserService(repositories.NewUserRepository())
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
-	var u User
+	var u models.User
 	err := json.NewDecoder(r.Body).Decode(&u)
 
 	if err != nil {
-		response := Response{http.StatusBadRequest, "Hata", r.Method, err.Error()}
+		response := models.Response{StatusCode: http.StatusBadRequest, Msg: "Hata", Method: r.Method, Name: err.Error()}
 		errorRespond(w, response)
 		return
 	}
@@ -46,7 +24,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	err = service.Register(u.Username, u.Password)
 
 	if err != nil {
-		response := Response{http.StatusBadRequest, "Hata", r.Method, err.Error()}
+		response := models.Response{StatusCode: http.StatusBadRequest, Msg: "Hata", Method: r.Method, Name: err.Error()}
 		errorRespond(w, response)
 		return
 	}
@@ -56,11 +34,11 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
-	var u User
+	var u models.User
 	err := json.NewDecoder(r.Body).Decode(&u)
 
 	if err != nil {
-		response := Response{http.StatusBadRequest, "Hata", r.Method, err.Error()}
+		response := models.Response{StatusCode: http.StatusBadRequest, Msg: "Hata", Method: r.Method, Name: err.Error()}
 		errorRespond(w, response)
 		return
 	}
@@ -68,7 +46,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	err = service.Login(u.Username, u.Password)
 
 	if err != nil {
-		response := Response{http.StatusNotFound, "Hata", r.Method, err.Error()}
+		response := models.Response{StatusCode: http.StatusNotFound, Msg: "Hata", Method: r.Method, Name: err.Error()}
 		errorRespond(w, response)
 		return
 	}
@@ -77,19 +55,19 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
-	var m Message
+	var m models.Message
 	err := json.NewDecoder(r.Body).Decode(&m)
 
 	if err != nil {
-		response := Response{http.StatusBadRequest, "Hata", r.Method, err.Error()}
+		response := models.Response{StatusCode: http.StatusBadRequest, Msg: "Hata", Method: r.Method, Name: err.Error()}
 		errorRespond(w, response)
 		return
 	}
 
-	err = service.SendMessage(m.FromUser, m.ToUser, m.Msg, m.date)
+	err = service.SendMessage(m.FromUser, m.ToUser, m.Msg, m.Date)
 
 	if err != nil {
-		response := Response{http.StatusBadRequest, "Hata", r.Method, err.Error()}
+		response := models.Response{StatusCode: http.StatusBadRequest, Msg: "Hata", Method: r.Method, Name: err.Error()}
 		errorRespond(w, response)
 		return
 	}
@@ -97,17 +75,17 @@ func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 func ViewMessages(w http.ResponseWriter, r *http.Request) {
-	var u User
+	var u models.User
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
-		response := Response{http.StatusBadRequest, "Hata", r.Method, err.Error()}
+		response := models.Response{StatusCode: http.StatusBadRequest, Msg: "Hata", Method: r.Method, Name: err.Error()}
 		errorRespond(w, response)
 		return
 	}
 	messages, err := service.ViewMessages(u.Username)
 
 	if err != nil {
-		response := Response{http.StatusBadRequest, "Hata", r.Method, err.Error()}
+		response := models.Response{StatusCode: http.StatusBadRequest, Msg: "Hata", Method: r.Method, Name: err.Error()}
 		errorRespond(w, response)
 		return
 	}
@@ -121,10 +99,10 @@ func ViewMessages(w http.ResponseWriter, r *http.Request) {
 }
 
 func BlockUserHandler(w http.ResponseWriter, r *http.Request) {
-	var b Block
+	var b models.Block
 	err := json.NewDecoder(r.Body).Decode(&b)
 	if err != nil {
-		response := Response{http.StatusBadRequest, "Hata", r.Method, err.Error()}
+		response := models.Response{StatusCode: http.StatusBadRequest, Msg: "Hata", Method: r.Method, Name: err.Error()}
 		errorRespond(w, response)
 		return
 	}
@@ -133,7 +111,7 @@ func BlockUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-func errorRespond(w http.ResponseWriter, r Response) {
+func errorRespond(w http.ResponseWriter, r models.Response) {
 	w.WriteHeader(r.StatusCode)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
