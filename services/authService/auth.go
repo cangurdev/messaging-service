@@ -1,6 +1,7 @@
 package authService
 
 import (
+	"cvngur/messaging-service/logs"
 	"cvngur/messaging-service/repositories/authRepository"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
@@ -38,8 +39,10 @@ func (*service) Login(username, password string) error {
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
+		logs.Write("Invalid Login")
 		return errors.New("invalid username or password")
 	}
+	logs.Write("Logged")
 	return nil
 }
 func isAvailableUsername(username string) bool {
