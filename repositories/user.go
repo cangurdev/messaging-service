@@ -4,6 +4,7 @@ import (
 	"context"
 	"cvngur/messaging-service/db"
 	"cvngur/messaging-service/interfaces"
+	"errors"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -41,16 +42,16 @@ var User struct {
 	BlockedUsers []string `json:"blockedUsers"`
 }
 
-func (*repository) ValidateUser(username, password string) error {
+func (*repository) GetUser(username string) (string, error) {
 
-	filter := bson.D{{Key: "username", Value: username}, {Key: "password", Value: password}}
+	filter := bson.D{{Key: "username", Value: username}}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	err := db.Connection().Collection("users").FindOne(ctx, filter).Decode(&User)
 	if err != nil {
-		return err
+		return "", errors.New("user cannot found")
 	}
-	return nil
+	return User.Password, nil
 }
 
 func (*repository) SendMessage(fromUser, toUser, msg, date string) error {

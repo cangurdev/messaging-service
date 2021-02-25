@@ -3,6 +3,7 @@ package services
 import (
 	"cvngur/messaging-service/interfaces"
 	"errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type service struct{}
@@ -15,7 +16,11 @@ func NewUserService(userRepository interfaces.UserRepository) interfaces.UserSer
 }
 
 func (*service) Register(username, password string) error {
-	err := repository.SaveUser(username, password)
+	bytePassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	err = repository.SaveUser(username, string(bytePassword))
 	if err != nil {
 		return err
 	}
@@ -23,9 +28,14 @@ func (*service) Register(username, password string) error {
 }
 
 func (*service) Login(username, password string) error {
-	err := repository.ValidateUser(username, password)
+
+	hashedPassword, err := repository.GetUser(username)
 	if err != nil {
 		return err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	if err != nil {
+		return errors.New("invalid username or password")
 	}
 	return nil
 }
@@ -49,7 +59,7 @@ func isBlockedUser(fromUser, toUser string) error {
 
 	for _, user := range blockedUsers {
 		if user == fromUser {
-			return errors.New("Cannot message to user")
+			return errors.New("cannot message to user")
 		}
 	}
 	return nil

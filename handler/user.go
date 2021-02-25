@@ -72,7 +72,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	err = service.Login(u.Username, u.Password)
 
 	if err != nil {
-		http.Error(w, "User Cannot Found", http.StatusNotFound)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
