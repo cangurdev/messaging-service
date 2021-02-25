@@ -2,6 +2,7 @@ package services
 
 import (
 	"cvngur/messaging-service/interfaces"
+	"cvngur/messaging-service/models"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -74,8 +75,12 @@ func isAvailableUsername(username string) bool {
 	}
 	return false
 }
-func (*service) ViewMessages(username string) error {
-	return nil
+func (*service) ViewMessages(username string) ([]models.Message, error) {
+	messages, err := repository.GetMessages(username)
+	if err != nil {
+		return nil, err
+	}
+	return messages, nil
 }
 func (*service) BlockUser(username, blockedUser string) error {
 	err := repository.BlockUser(username, blockedUser)

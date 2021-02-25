@@ -4,6 +4,7 @@ import (
 	"context"
 	"cvngur/messaging-service/db"
 	"cvngur/messaging-service/interfaces"
+	"cvngur/messaging-service/models"
 	"errors"
 	"time"
 
@@ -21,8 +22,8 @@ func (*repository) SaveUser(username, password string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var messages []string
-	var blockedUsers []string
+	messages := make([]models.Message, 0)
+	blockedUsers := make([]models.Message, 0)
 
 	_, err := db.Connection().Collection("users").InsertOne(ctx, bson.D{{Key: "username", Value: username}, {
 		Key: "password", Value: password,
@@ -36,10 +37,10 @@ func (*repository) SaveUser(username, password string) error {
 }
 
 var User struct {
-	Username     string   `json:"username"`
-	Password     string   `json:"password"`
-	Messages     []string `json:"messages"`
-	BlockedUsers []string `json:"blockedUsers"`
+	Username     string           `json:"username"`
+	Password     string           `json:"password"`
+	Messages     []models.Message `json:"messages"`
+	BlockedUsers []string         `json:"blockedUsers"`
 }
 
 func (*repository) GetUser(username string) (string, error) {
@@ -56,21 +57,35 @@ func (*repository) GetUser(username string) (string, error) {
 
 func (*repository) SendMessage(fromUser, toUser, msg, date string) error {
 
+	var message models.Message
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := db.Connection().Collection("users").UpdateOne(ctx, bson.M{"username": fromUser}, bson.D{{"$push", bson.D{{"messages", msg}}}})
+	message.FromUser = fromUser
+	message.ToUser = toUser
+	message.Msg = msg
+	message.Date = date
+
+	_, err := db.Connection().Collection("users").UpdateOne(ctx, bson.M{"username": fromUser}, bson.D{{"$push", bson.D{{"messages", message}}}})
 	if err != nil {
 		return err
 	}
-	_, err = db.Connection().Collection("users").UpdateOne(ctx, bson.M{"username": toUser}, bson.D{{"$push", bson.D{{"messages", msg}}}})
+	_, err = db.Connection().Collection("users").UpdateOne(ctx, bson.M{"username": toUser}, bson.D{{"$push", bson.D{{"messages", message}}}})
 	if err != nil {
 		return err
 	}
 	return nil
 }
-func (*repository) GetMessages(username string) error {
-	return nil
+func (*repository) GetMessages(username string) ([]models.Message, error) {
+	filter := bson.D{{Key: "username", Value: username}}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err := db.Connection().Collection("users").FindOne(ctx, filter).Decode(&User)
+	if err != nil {
+		return nil, errors.New("user cannot found")
+	}
+
+	return User.Messages, nil
 }
 func (*repository) BlockUser(username, blockedUser string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
