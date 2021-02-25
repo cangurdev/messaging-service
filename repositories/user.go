@@ -19,9 +19,13 @@ func NewUserRepository() interfaces.UserRepository {
 func (*repository) SaveUser(username, password string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
+	var messages []string
+	var blockedUsers []string
+
 	_, err := db.Connection().Collection("users").InsertOne(ctx, bson.D{{Key: "username", Value: username}, {
 		Key: "password", Value: password,
-	}})
+	}, {Key: "messages", Value: messages}, {Key: "blockedUsers", Value: blockedUsers}})
 
 	if err != nil {
 		return err
@@ -31,8 +35,10 @@ func (*repository) SaveUser(username, password string) error {
 }
 
 var User struct {
-	Username string
-	Password string
+	Username     string   `json:"username"`
+	Password     string   `json:"password"`
+	Messages     []string `json:"messages"`
+	blockedUsers []string `json:"blockedUsers"`
 }
 
 func (*repository) ValidateUser(username, password string) error {
@@ -47,7 +53,14 @@ func (*repository) ValidateUser(username, password string) error {
 	return nil
 }
 
-func (*repository) SendMessage(username string) error {
+func (*repository) SendMessage(username, msg, date string) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, err := db.Connection().Collection("users").UpdateOne(ctx, bson.M{"username": username}, bson.D{{"$push", bson.D{{"messages", msg}}}})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 func (*repository) GetMessages(username string) error {

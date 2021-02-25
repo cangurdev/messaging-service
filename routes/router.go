@@ -10,4 +10,6 @@ func SetupRoutes(router *mux.Router) {
 
 	router.HandleFunc("/register", handler.RegisterHandler).Methods("POST")
 	router.HandleFunc("/login", handler.LoginHandler).Methods("POST")
+	router.HandleFunc("/send", handler.SendMessageHandler).Methods("POST")
+	router.HandleFunc("/view", handler.ViewMessages).Methods("GET")
 }

@@ -8,14 +8,21 @@ import (
 )
 
 type User struct {
-	Username string
-	Password string
+	Username     string   `json:"username"`
+	Password     string   `json:"password"`
+	Messages     []string `json:"messages"`
+	blockedUsers []string `json:"blockedUsers"`
 }
 type Response struct {
 	StatusCode int
 	Msg        string
 	Method     string
 	Name       string
+}
+type Message struct {
+	Username string
+	Msg      string
+	date     string
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
@@ -65,4 +72,23 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	return
+}
+func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
+	var m Message
+	err := json.NewDecoder(r.Body).Decode(&m)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	service := services.NewUserService(repositories.NewUserRepository())
+
+	err = service.SendMessage(m.Username, m.Msg, m.date)
+
+	if err != nil {
+		return
+	}
+}
+func ViewMessages(w http.ResponseWriter, r *http.Request) {
+
 }

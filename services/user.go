@@ -29,7 +29,11 @@ func (*service) Login(username, password string) error {
 	return nil
 }
 
-func (*service) SendMessage(username string) error {
+func (*service) SendMessage(username, msg, date string) error {
+	err := repository.SendMessage(username, msg, date)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 func (*service) ViewMessages(username string) error {
