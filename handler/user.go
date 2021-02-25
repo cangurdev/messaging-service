@@ -40,10 +40,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		resp := Response{400, "Hata", r.Method, err.Error()}
 		w.WriteHeader(http.StatusBadRequest)
-		err := json.NewEncoder(w).Encode(resp)
-		if err != nil {
-			return
-		}
+		json.NewEncoder(w).Encode(resp)
 		return
 	}
 
@@ -52,7 +49,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		resp := Response{400, "Hata", r.Method, err.Error()}
 		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
 		json.NewEncoder(w).Encode(resp)
+		return
 	}
 
 	w.WriteHeader(http.StatusCreated)

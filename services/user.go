@@ -16,6 +16,9 @@ func NewUserService(userRepository interfaces.UserRepository) interfaces.UserSer
 }
 
 func (*service) Register(username, password string) error {
+	if !isAvailableUsername(username) {
+		return errors.New("username is not available")
+	}
 	bytePassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -63,6 +66,13 @@ func isBlockedUser(fromUser, toUser string) error {
 		}
 	}
 	return nil
+}
+func isAvailableUsername(username string) bool {
+	_, err := repository.GetUser(username)
+	if err != nil {
+		return true
+	}
+	return false
 }
 func (*service) ViewMessages(username string) error {
 	return nil
