@@ -2,14 +2,13 @@ package services
 
 import (
 	"cvngur/messaging-service/interfaces"
-	"cvngur/messaging-service/repositories"
 )
 
 type service struct{}
 
-var repository repositories.UserRepository
+var repository interfaces.UserRepository
 
-func NewUserService(userRepository repositories.UserRepository) interfaces.UserService {
+func NewUserService(userRepository interfaces.UserRepository) interfaces.UserService {
 	repository = userRepository
 	return &service{}
 }
@@ -22,12 +21,12 @@ func (*service) Register(username, password string) error {
 	return nil
 }
 
-func (*service) Login(username, password string) (bool, error) {
-	result, err := repository.ValidateUser(username, password)
+func (*service) Login(username, password string) error {
+	err := repository.ValidateUser(username, password)
 	if err != nil {
-		return false, err
+		return err
 	}
-	return result, nil
+	return nil
 }
 
 func (*service) SendMessage(username string) error {

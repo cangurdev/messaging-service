@@ -56,17 +56,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	service := services.NewUserService(repositories.NewUserRepository())
 
-	validate, err := service.Login(u.Username, u.Password)
+	err = service.Login(u.Username, u.Password)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "User Cannot Found", http.StatusNotFound)
 		return
 	}
 
-	if validate {
-		w.WriteHeader(http.StatusOK)
-	}
-
-	w.WriteHeader(http.StatusForbidden)
+	w.WriteHeader(http.StatusOK)
 	return
 }
