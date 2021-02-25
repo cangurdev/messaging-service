@@ -20,9 +20,10 @@ type Response struct {
 	Name       string
 }
 type Message struct {
-	Username string
-	Msg      string
-	date     string
+	FromUser string `json:"fromUser"`
+	ToUser   string `json:"toUser"`
+	Msg      string `json:"msg"`
+	date     string `json:"date"`
 }
 type Block struct {
 	Username    string
@@ -39,7 +40,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		resp := Response{400, "Hata", r.Method, err.Error()}
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(resp)
+		err := json.NewEncoder(w).Encode(resp)
+		if err != nil {
+			return
+		}
 		return
 	}
 
@@ -78,14 +82,17 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	var m Message
 	err := json.NewDecoder(r.Body).Decode(&m)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = service.SendMessage(m.Username, m.Msg, m.date)
+	err = service.SendMessage(m.FromUser, m.ToUser, m.Msg, m.date)
 
 	if err != nil {
+		http.Error(w, err.Error(), 400)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 }

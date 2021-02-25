@@ -2,6 +2,7 @@ package services
 
 import (
 	"cvngur/messaging-service/interfaces"
+	"errors"
 )
 
 type service struct{}
@@ -29,10 +30,27 @@ func (*service) Login(username, password string) error {
 	return nil
 }
 
-func (*service) SendMessage(username, msg, date string) error {
-	err := repository.SendMessage(username, msg, date)
+func (*service) SendMessage(fromUser, toUser, msg, date string) error {
+	err := isBlockedUser(fromUser, toUser)
 	if err != nil {
 		return err
+	}
+
+	err = repository.SendMessage(fromUser, toUser, msg, date)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func isBlockedUser(fromUser, toUser string) error {
+	blockedUsers := repository.GetBlockedUsers(toUser)
+
+	for _, user := range blockedUsers {
+		if user == fromUser {
+			return errors.New("Cannot message to user")
+		}
 	}
 	return nil
 }

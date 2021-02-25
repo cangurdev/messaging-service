@@ -38,7 +38,7 @@ var User struct {
 	Username     string   `json:"username"`
 	Password     string   `json:"password"`
 	Messages     []string `json:"messages"`
-	blockedUsers []string `json:"blockedUsers"`
+	BlockedUsers []string `json:"blockedUsers"`
 }
 
 func (*repository) ValidateUser(username, password string) error {
@@ -53,11 +53,16 @@ func (*repository) ValidateUser(username, password string) error {
 	return nil
 }
 
-func (*repository) SendMessage(username, msg, date string) error {
+func (*repository) SendMessage(fromUser, toUser, msg, date string) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	_, err := db.Connection().Collection("users").UpdateOne(ctx, bson.M{"username": username}, bson.D{{"$push", bson.D{{"messages", msg}}}})
+
+	_, err := db.Connection().Collection("users").UpdateOne(ctx, bson.M{"username": fromUser}, bson.D{{"$push", bson.D{{"messages", msg}}}})
+	if err != nil {
+		return err
+	}
+	_, err = db.Connection().Collection("users").UpdateOne(ctx, bson.M{"username": toUser}, bson.D{{"$push", bson.D{{"messages", msg}}}})
 	if err != nil {
 		return err
 	}
@@ -74,4 +79,16 @@ func (*repository) BlockUser(username, blockedUser string) error {
 		return err
 	}
 	return nil
+}
+
+func (*repository) GetBlockedUsers(username string) []string {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err := db.Connection().Collection("users").FindOne(ctx, bson.D{{Key: "username", Value: username}}).Decode(&User)
+
+	if err != nil {
+		return nil
+	}
+	return User.BlockedUsers
 }
