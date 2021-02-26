@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func Test_should_return_nl(t *testing.T) {
+func Test_should_return_nil_when_user_blocked_someone(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockUserRepository)
 	uService := userService.NewUserService(mockRepo)
@@ -20,7 +20,7 @@ func Test_should_return_nl(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 	assert.Equal(t, nil, sut)
 }
-func Test_should_return_error_when_blocked_undefined_user(t *testing.T) {
+func Test_should_return_error_when_blocked_nonexistent_user(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockUserRepository)
 	uService := userService.NewUserService(mockRepo)

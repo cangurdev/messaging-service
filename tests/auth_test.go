@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func Test_should_return_nil(t *testing.T) {
+func Test_should_return_nil_when_user_register(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockAuthRepository)
 	aService := authService.NewAuthService(mockRepo)
@@ -48,7 +48,7 @@ func Test_should_return_error_when_login_with_invalid_username(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 	assert.EqualError(t, sut, "user cannot found")
 }
-func Test_should_return_error_when_login_with_wrong_pasword(t *testing.T) {
+func Test_should_return_error_when_login_with_wrong_password(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockAuthRepository)
 	aService := authService.NewAuthService(mockRepo)
