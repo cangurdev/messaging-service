@@ -1,5 +1,12 @@
 # Messaging Service
 
+## Stack
+
+- Golang
+- MongoDb
+- Gorilla/mux
+- Testify
+
 ## Endpoints
 
 ### `POST` /login
@@ -55,6 +62,5 @@ Request Body
 ```
 {
     "username":"Can",
-    "password":"123456"
 }
 ```
