@@ -22,11 +22,11 @@ func (*service) Register(username, password string) error {
 	}
 	bytePassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return errors.New("cannot create a new user")
 	}
 	err = repository.SaveUser(username, string(bytePassword))
 	if err != nil {
-		return err
+		return errors.New("cannot create a new user")
 	}
 	return nil
 }

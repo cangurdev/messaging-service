@@ -23,14 +23,14 @@ func (*service) SendMessage(fromUser, toUser, msg, date string) error {
 
 	err = repository.SendMessage(fromUser, toUser, msg, date)
 	if err != nil {
-		return err
+		return errors.New("cannot send message")
 	}
 	return nil
 }
 func (*service) ViewMessages(username string) ([]models.Message, error) {
 	messages, err := repository.GetMessages(username)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("cannot view messages")
 	}
 	return messages, nil
 }
