@@ -1,17 +1,17 @@
-package authService
+package services
 
 import (
+	"cvngur/messaging-service/domain"
 	"cvngur/messaging-service/logs"
-	"cvngur/messaging-service/repositories/authRepository"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var repository authRepository.AuthRepository
+var repository domain.AuthRepository
 
 type service struct{}
 
-func NewAuthService(authRepository authRepository.AuthRepository) AuthService {
+func NewAuthService(authRepository domain.AuthRepository) domain.AuthService {
 	repository = authRepository
 	return &service{}
 }

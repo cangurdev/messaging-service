@@ -1,31 +1,24 @@
-package messageRepository
+package repositories
 
 import (
 	"context"
 	"cvngur/messaging-service/db"
-	"cvngur/messaging-service/models"
+	"cvngur/messaging-service/domain"
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"time"
 )
 
-type repository struct {
+type mRepo struct {
 }
 
-func NewMessageRepository() MessageRepository {
-	return &repository{}
+func NewMessageRepository() domain.MessageRepository {
+	return &mRepo{}
 }
 
-var User struct {
-	Username     string           `json:"username"`
-	Password     string           `json:"password"`
-	Messages     []models.Message `json:"messages"`
-	BlockedUsers []string         `json:"blockedUsers"`
-}
+func (*mRepo) SendMessage(fromUser, toUser, msg, date string) error {
 
-func (*repository) SendMessage(fromUser, toUser, msg, date string) error {
-
-	var message models.Message
+	var message domain.Message
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -44,19 +37,20 @@ func (*repository) SendMessage(fromUser, toUser, msg, date string) error {
 	}
 	return nil
 }
-func (*repository) GetMessages(username string) ([]models.Message, error) {
+func (*mRepo) GetMessages(username string) ([]domain.Message, error) {
 	filter := bson.D{{Key: "username", Value: username}}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	err := db.Connection().Collection("users").FindOne(ctx, filter).Decode(&User)
+	var user domain.User
+	err := db.Connection().Collection("users").FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		return nil, errors.New("user cannot found")
 	}
 
-	return User.Messages, nil
+	return user.Messages, nil
 }
 
-func (*repository) GetBlockedUsers(username string) []string {
+func (*mRepo) GetBlockedUsers(username string) []string {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"cvngur/messaging-service/repositories/userRepository"
-	"cvngur/messaging-service/services/userService"
+	"cvngur/messaging-service/app/repositories"
+	"cvngur/messaging-service/app/services"
 	"encoding/json"
 	"net/http"
 )
 
-var service = userService.NewUserService(userRepository.NewUserRepository())
+var service = services.NewUserService(repositories.NewUserRepository())
 
 func BlockUserHandler(w http.ResponseWriter, r *http.Request) {
 	var b Block

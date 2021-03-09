@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"cvngur/messaging-service/services/userService"
+	"cvngur/messaging-service/app/services"
 	"errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -10,7 +10,7 @@ import (
 func Test_should_return_nil_when_user_blocked_someone(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockUserRepository)
-	uService := userService.NewUserService(mockRepo)
+	uService := services.NewUserService(mockRepo)
 	mockRepo.On("BlockUser").Return(nil)
 
 	//Act
@@ -23,7 +23,7 @@ func Test_should_return_nil_when_user_blocked_someone(t *testing.T) {
 func Test_should_return_error_when_blocked_nonexistent_user(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockUserRepository)
-	uService := userService.NewUserService(mockRepo)
+	uService := services.NewUserService(mockRepo)
 	mockRepo.On("BlockUser").Return(errors.New(""))
 
 	//Act

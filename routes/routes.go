@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"cvngur/messaging-service/handler"
+	"cvngur/messaging-service/app/handler"
 
 	"github.com/gorilla/mux"
 )

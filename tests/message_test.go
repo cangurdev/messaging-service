@@ -1,8 +1,8 @@
 package tests
 
 import (
-	"cvngur/messaging-service/models"
-	"cvngur/messaging-service/services/messageService"
+	"cvngur/messaging-service/app/services"
+	"cvngur/messaging-service/domain"
 	"errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -12,7 +12,7 @@ func Test_should_return_nil_when_user_send_message(t *testing.T) {
 
 	//Arrange
 	mockRepo := new(MockMessageRepository)
-	mService := messageService.NewMessageService(mockRepo)
+	mService := services.NewMessageService(mockRepo)
 	mockRepo.On("SendMessage").Return(nil)
 
 	var blockedUsers []string
@@ -29,7 +29,7 @@ func Test_should_return_error_when_blocked_user_send_message(t *testing.T) {
 
 	//Arrange
 	mockRepo := new(MockMessageRepository)
-	mService := messageService.NewMessageService(mockRepo)
+	mService := services.NewMessageService(mockRepo)
 
 	blockedUsers := []string{"Can", "Burak"}
 	mockRepo.On("GetBlockedUsers").Return(blockedUsers)
@@ -45,9 +45,9 @@ func Test_should_return_messages(t *testing.T) {
 
 	//Arrange
 	mockRepo := new(MockMessageRepository)
-	mService := messageService.NewMessageService(mockRepo)
+	mService := services.NewMessageService(mockRepo)
 
-	messages := []models.Message{{"Can", "Ali", "Hello", "01.01.2021"},
+	messages := []domain.Message{{"Can", "Ali", "Hello", "01.01.2021"},
 		{"Ali", "Can", "Hi", "01.01.2021"}}
 	mockRepo.On("GetMessages").Return(messages, nil)
 
@@ -63,8 +63,8 @@ func Test_should_return_error_when_cannot_get_messages(t *testing.T) {
 
 	//Arrange
 	mockRepo := new(MockMessageRepository)
-	mService := messageService.NewMessageService(mockRepo)
-	var messages []models.Message
+	mService := services.NewMessageService(mockRepo)
+	var messages []domain.Message
 	mockRepo.On("GetMessages").Return(messages, errors.New(""))
 
 	//Act
@@ -79,7 +79,7 @@ func Test_should_return_error_when_cannot_send_message(t *testing.T) {
 
 	//Arrange
 	mockRepo := new(MockMessageRepository)
-	mService := messageService.NewMessageService(mockRepo)
+	mService := services.NewMessageService(mockRepo)
 	blockedUsers := []string{"Halil", "Burak"}
 	mockRepo.On("GetBlockedUsers").Return(blockedUsers)
 	mockRepo.On("SendMessage").Return(errors.New(""))

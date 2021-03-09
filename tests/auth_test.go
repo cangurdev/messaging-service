@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"cvngur/messaging-service/services/authService"
+	"cvngur/messaging-service/app/services"
 	"errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -10,7 +10,7 @@ import (
 func Test_should_return_nil_when_user_register(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockAuthRepository)
-	aService := authService.NewAuthService(mockRepo)
+	aService := services.NewAuthService(mockRepo)
 	mockRepo.On("GetUser").Return("", errors.New(""))
 	mockRepo.On("SaveUser").Return(nil)
 
@@ -24,7 +24,7 @@ func Test_should_return_nil_when_user_register(t *testing.T) {
 func Test_should_return_error_when_register_with_existed_username(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockAuthRepository)
-	aService := authService.NewAuthService(mockRepo)
+	aService := services.NewAuthService(mockRepo)
 	mockRepo.On("GetUser").Return("", nil)
 
 	//Act
@@ -38,7 +38,7 @@ func Test_should_return_error_when_register_with_existed_username(t *testing.T) 
 func Test_should_return_error_when_login_with_invalid_username(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockAuthRepository)
-	aService := authService.NewAuthService(mockRepo)
+	aService := services.NewAuthService(mockRepo)
 	mockRepo.On("GetUser").Return("", errors.New("user cannot found"))
 
 	//Act
@@ -51,7 +51,7 @@ func Test_should_return_error_when_login_with_invalid_username(t *testing.T) {
 func Test_should_return_error_when_login_with_wrong_password(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockAuthRepository)
-	aService := authService.NewAuthService(mockRepo)
+	aService := services.NewAuthService(mockRepo)
 	mockRepo.On("GetUser").Return("", nil)
 
 	//Act
@@ -64,7 +64,7 @@ func Test_should_return_error_when_login_with_wrong_password(t *testing.T) {
 func Test_should_return_nil_when_user_login(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockAuthRepository)
-	aService := authService.NewAuthService(mockRepo)
+	aService := services.NewAuthService(mockRepo)
 	mockRepo.On("GetUser").Return("$2a$10$7MurfuyBkblOftBebvnaxuE9l2Y5n5E1W2RruIMjPIFCcZS0Vhs2K", nil)
 
 	//Act
@@ -77,7 +77,7 @@ func Test_should_return_nil_when_user_login(t *testing.T) {
 func Test_should_return_error_when_user_cannot_register(t *testing.T) {
 	//Arrange
 	mockRepo := new(MockAuthRepository)
-	aService := authService.NewAuthService(mockRepo)
+	aService := services.NewAuthService(mockRepo)
 	mockRepo.On("GetUser").Return("", errors.New(""))
 	mockRepo.On("SaveUser").Return(errors.New(""))
 

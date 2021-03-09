@@ -1,17 +1,18 @@
 package handler
 
 import (
-	"cvngur/messaging-service/repositories/authRepository"
-	"cvngur/messaging-service/services/authService"
+	"cvngur/messaging-service/app/repositories"
+	"cvngur/messaging-service/app/services"
+	"cvngur/messaging-service/domain"
 	"encoding/json"
 	"net/http"
 )
 
-var aService = authService.NewAuthService(authRepository.NewUserRepository())
+var aService = services.NewAuthService(repositories.NewAuthRepository())
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
-	var u User
+	var u domain.User
 	err := json.NewDecoder(r.Body).Decode(&u)
 
 	if err != nil {
@@ -33,7 +34,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
-	var u User
+	var u domain.User
 	err := json.NewDecoder(r.Body).Decode(&u)
 
 	if err != nil {

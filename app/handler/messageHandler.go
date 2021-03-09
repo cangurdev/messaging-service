@@ -1,17 +1,17 @@
 package handler
 
 import (
-	"cvngur/messaging-service/models"
-	"cvngur/messaging-service/repositories/messageRepository"
-	"cvngur/messaging-service/services/messageService"
+	"cvngur/messaging-service/app/repositories"
+	"cvngur/messaging-service/app/services"
+	"cvngur/messaging-service/domain"
 	"encoding/json"
 	"net/http"
 )
 
-var mService = messageService.NewMessageService(messageRepository.NewMessageRepository())
+var mService = services.NewMessageService(repositories.NewMessageRepository())
 
 func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
-	var m models.Message
+	var m domain.Message
 	err := json.NewDecoder(r.Body).Decode(&m)
 
 	if err != nil {
@@ -31,7 +31,7 @@ func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 func ViewMessages(w http.ResponseWriter, r *http.Request) {
-	var u User
+	var u domain.User
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
 		response := Response{StatusCode: http.StatusBadRequest, Msg: "Hata", Method: r.Method, Name: err.Error()}

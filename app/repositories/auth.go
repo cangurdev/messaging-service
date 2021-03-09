@@ -1,9 +1,9 @@
-package authRepository
+package repositories
 
 import (
 	"context"
 	"cvngur/messaging-service/db"
-	"cvngur/messaging-service/models"
+	"cvngur/messaging-service/domain"
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"time"
@@ -12,14 +12,14 @@ import (
 type repository struct {
 }
 
-func NewUserRepository() AuthRepository {
+func NewAuthRepository() domain.AuthRepository {
 	return &repository{}
 }
 
 var User struct {
 	Username     string           `json:"username"`
 	Password     string           `json:"password"`
-	Messages     []models.Message `json:"messages"`
+	Messages     []domain.Message `json:"messages"`
 	BlockedUsers []string         `json:"blockedUsers"`
 }
 
@@ -27,8 +27,8 @@ func (*repository) SaveUser(username, password string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	messages := make([]models.Message, 0)
-	blockedUsers := make([]models.Message, 0)
+	messages := make([]domain.Message, 0)
+	blockedUsers := make([]domain.Message, 0)
 
 	_, err := db.Connection().Collection("users").InsertOne(ctx, bson.D{{Key: "username", Value: username}, {
 		Key: "password", Value: password,
