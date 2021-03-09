@@ -54,10 +54,12 @@ func (*mRepo) GetBlockedUsers(username string) []string {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	err := db.Connection().Collection("users").FindOne(ctx, bson.D{{Key: "username", Value: username}}).Decode(&User)
+
+	var user domain.User
+	err := db.Connection().Collection("users").FindOne(ctx, bson.D{{Key: "username", Value: username}}).Decode(&user)
 
 	if err != nil {
 		return nil
 	}
-	return User.BlockedUsers
+	return user.BlockedUsers
 }

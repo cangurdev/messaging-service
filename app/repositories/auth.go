@@ -16,13 +16,6 @@ func NewAuthRepository() domain.AuthRepository {
 	return &repository{}
 }
 
-var User struct {
-	Username     string           `json:"username"`
-	Password     string           `json:"password"`
-	Messages     []domain.Message `json:"messages"`
-	BlockedUsers []string         `json:"blockedUsers"`
-}
-
 func (*repository) SaveUser(username, password string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -46,9 +39,11 @@ func (*repository) GetUser(username string) (string, error) {
 	filter := bson.D{{Key: "username", Value: username}}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	err := db.Connection().Collection("users").FindOne(ctx, filter).Decode(&User)
+
+	var user domain.User
+	err := db.Connection().Collection("users").FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		return "", errors.New("user cannot found")
 	}
-	return User.Password, nil
+	return user.Password, nil
 }
